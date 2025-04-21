@@ -1,0 +1,267 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_OGRENCI 100
+#define MAX_DERS 10
+
+typedef struct {
+    char dersAdi[50];
+    float vize;
+    float final;
+    int devamsizlik;
+    float ortalama;
+} Ders;
+
+typedef struct {
+    char isim[50];
+    int numara;
+    int dersSayisi;
+    Ders dersler[MAX_DERS];
+} Ogrenci;
+
+Ogrenci ogrenciler[MAX_OGRENCI];
+int ogrenciSayisi = 0;
+
+// Fonksiyon Prototipleri
+void anaMenu();
+void girisMenusu();
+void yoneticiMenusu();
+void ogrenciEkle();
+void notGir();
+void devamsizlikGir();
+void dersEkleCikar();
+void notlariGoster(Ogrenci ogr);
+void devamsizlikGoster(Ogrenci ogr);
+
+// Ana fonksiyon
+int main() {
+    anaMenu();
+    return 0;
+}
+
+// 🌟 Görselli Ana Menü 🌟
+void anaMenu() {
+    int secim;
+
+    printf("\n=====================================\n");
+    printf("        📚 UNIVERSITE OBS SISTEMI\n");
+    printf("=====================================\n");
+
+    do {
+        printf("\n");
+        printf("╔══════════════════════════════╗\n");
+        printf("║          🌟 ANA MENU 🌟        ║\n");
+        printf("╠══════════════════════════════╣\n");
+        printf("║ 1️⃣  Giriş (Öğrenci)           ║\n");
+        printf("║ 2️⃣  Yönetici Menüsü           ║\n");
+        printf("║ 3️⃣  Çıkış                     ║\n");
+        printf("╚══════════════════════════════╝\n");
+        printf("👉 Seçiminizi yapın: ");
+        scanf("%d", &secim);
+
+        switch (secim) {
+            case 1:
+                girisMenusu();
+                break;
+            case 2:
+                yoneticiMenusu();
+                break;
+            case 3:
+                printf("🔒 Cikis yapiliyor...\n");
+                break;
+            default:
+                printf("❌ Gecersiz secim! Lütfen tekrar deneyin.\n");
+        }
+    } while (secim != 3);
+}
+
+// Öğrenci Giriş Menüsü
+void girisMenusu() {
+    int numara, secim;
+    printf("\nOgrenci numarasi giriniz: ");
+    scanf("%d", &numara);
+
+    for (int i = 0; i < ogrenciSayisi; i++) {
+        if (ogrenciler[i].numara == numara) {
+            do {
+                printf("\n--- OGRENCI MENU ---\n");
+                printf("1. Notlari Goruntule\n");
+                printf("2. Devamsizlik Bilgisi\n");
+                printf("3. Cikis\n");
+                printf("Seciminiz: ");
+                scanf("%d", &secim);
+
+                switch (secim) {
+                    case 1:
+                        notlariGoster(ogrenciler[i]);
+                        break;
+                    case 2:
+                        devamsizlikGoster(ogrenciler[i]);
+                        break;
+                    case 3:
+                        printf("Ogrenci menusunden cikiliyor...\n");
+                        break;
+                    default:
+                        printf("Gecersiz secim!\n");
+                }
+            } while (secim != 3);
+            return;
+        }
+    }
+    printf("❗ Ogrenci bulunamadi.\n");
+}
+
+// Yönetici Menüsü
+void yoneticiMenusu() {
+    int secim;
+    do {
+        printf("\n--- YONETICI MENU ---\n");
+        printf("1. Ogrenci Ekle\n");
+        printf("2. Not Gir\n");
+        printf("3. Devamsizlik Gir\n");
+        printf("4. Ders Ekle/Cikar\n");
+        printf("5. Cikis\n");
+        printf("Seciminiz: ");
+        scanf("%d", &secim);
+
+        switch (secim) {
+            case 1:
+                ogrenciEkle();
+                break;
+            case 2:
+                notGir();
+                break;
+            case 3:
+                devamsizlikGir();
+                break;
+            case 4:
+                dersEkleCikar();
+                break;
+            case 5:
+                printf("Yonetici menusunden cikiliyor...\n");
+                break;
+            default:
+                printf("Gecersiz secim!\n");
+        }
+    } while (secim != 5);
+}
+
+// Öğrenci Ekleme
+void ogrenciEkle() {
+    if (ogrenciSayisi >= MAX_OGRENCI) {
+        printf("⚠️ Ogrenci kapasitesi dolu!\n");
+        return;
+    }
+    printf("Ogrenci adi: ");
+    scanf(" %[^\n]", ogrenciler[ogrenciSayisi].isim);
+    printf("Ogrenci numarasi: ");
+    scanf("%d", &ogrenciler[ogrenciSayisi].numara);
+    ogrenciler[ogrenciSayisi].dersSayisi = 0;
+    ogrenciSayisi++;
+    printf("✅ Ogrenci eklendi.\n");
+}
+
+// Not Girişi
+void notGir() {
+    int numara;
+    printf("Ogrenci numarasi: ");
+    scanf("%d", &numara);
+    for (int i = 0; i < ogrenciSayisi; i++) {
+        if (ogrenciler[i].numara == numara) {
+            for (int j = 0; j < ogrenciler[i].dersSayisi; j++) {
+                printf("%s icin Vize ve Final notlarini giriniz:\n", ogrenciler[i].dersler[j].dersAdi);
+                printf("Vize: ");
+                scanf("%f", &ogrenciler[i].dersler[j].vize);
+                printf("Final: ");
+                scanf("%f", &ogrenciler[i].dersler[j].final);
+                ogrenciler[i].dersler[j].ortalama =
+                    ogrenciler[i].dersler[j].vize * 0.4 + ogrenciler[i].dersler[j].final * 0.6;
+            }
+            return;
+        }
+    }
+    printf("❗ Ogrenci bulunamadi.\n");
+}
+
+// Devamsızlık Girişi
+void devamsizlikGir() {
+    int numara;
+    printf("Ogrenci numarasi: ");
+    scanf("%d", &numara);
+    for (int i = 0; i < ogrenciSayisi; i++) {
+        if (ogrenciler[i].numara == numara) {
+            for (int j = 0; j < ogrenciler[i].dersSayisi; j++) {
+                printf("%s icin devamsizlik sayisi: ", ogrenciler[i].dersler[j].dersAdi);
+                scanf("%d", &ogrenciler[i].dersler[j].devamsizlik);
+            }
+            return;
+        }
+    }
+    printf("❗ Ogrenci bulunamadi.\n");
+}
+
+// Ders Ekle/Sil
+void dersEkleCikar() {
+    int numara, secim;
+    printf("Ogrenci numarasi: ");
+    scanf("%d", &numara);
+    for (int i = 0; i < ogrenciSayisi; i++) {
+        if (ogrenciler[i].numara == numara) {
+            printf("1. Ders Ekle\n2. Ders Cikar\nSecim: ");
+            scanf("%d", &secim);
+            if (secim == 1) {
+                if (ogrenciler[i].dersSayisi < MAX_DERS) {
+                    printf("Ders adi: ");
+                    scanf(" %[^\n]", ogrenciler[i].dersler[ogrenciler[i].dersSayisi].dersAdi);
+                    ogrenciler[i].dersSayisi++;
+                    printf("✅ Ders eklendi.\n");
+                } else {
+                    printf("⚠️ Ders sayisi maksimuma ulasti.\n");
+                }
+            } else if (secim == 2) {
+                char dersAdi[50];
+                printf("Silinecek ders adi: ");
+                scanf(" %[^\n]", dersAdi);
+                int found = 0;
+                for (int j = 0; j < ogrenciler[i].dersSayisi; j++) {
+                    if (strcmp(ogrenciler[i].dersler[j].dersAdi, dersAdi) == 0) {
+                        for (int k = j; k < ogrenciler[i].dersSayisi - 1; k++) {
+                            ogrenciler[i].dersler[k] = ogrenciler[i].dersler[k + 1];
+                        }
+                        ogrenciler[i].dersSayisi--;
+                        printf("🗑️ Ders silindi.\n");
+                        found = 1;
+                        break;
+                    }
+                }
+                if (!found) printf("❗ Ders bulunamadi.\n");
+            }
+            return;
+        }
+    }
+    printf("❗ Ogrenci bulunamadi.\n");
+}
+
+// Not Göster
+void notlariGoster(Ogrenci ogr) {
+    for (int i = 0; i < ogr.dersSayisi; i++) {
+        printf("\n📘 Ders: %s\n", ogr.dersler[i].dersAdi);
+        printf("Vize: %.2f, Final: %.2f, Ortalama: %.2f\n",
+               ogr.dersler[i].vize, ogr.dersler[i].final, ogr.dersler[i].ortalama);
+        if (ogr.dersler[i].ortalama >= 50)
+            printf("✅ Durum: GECTI\n");
+        else
+            printf("❌ Durum: KALDI\n");
+    }
+}
+
+// Devamsızlık Göster
+void devamsizlikGoster(Ogrenci ogr) {
+    for (int i = 0; i < ogr.dersSayisi; i++) {
+        printf("📕 Ders: %s - Devamsizlik: %d\n", ogr.dersler[i].dersAdi, ogr.dersler[i].devamsizlik);
+    }
+}
+
+
